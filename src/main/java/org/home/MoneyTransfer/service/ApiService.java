@@ -1,6 +1,7 @@
 package org.home.MoneyTransfer.service;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.home.MoneyTransfer.dto.ApiRequest;
 import org.home.MoneyTransfer.dto.ConfirmRequest;
 import org.home.MoneyTransfer.dto.TransferRequest;
@@ -12,7 +13,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class ApiService {
 
+    @Getter
     private ConfirmService confirmService;
+    @Getter
     private TransferService transferService;
 
     /**

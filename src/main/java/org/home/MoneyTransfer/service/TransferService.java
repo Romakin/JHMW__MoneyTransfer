@@ -92,4 +92,12 @@ public class TransferService {
                 Currency.valueWithLabel(amount.getCurrency()));
         return balanceVal - amount.getValue() > 0;
     }
+
+    public PayCardRepository getPayCardRepository() {
+        return payCardRepository;
+    }
+
+    public OperationReporitory getOperationReporitory() {
+        return operationReporitory;
+    }
 }

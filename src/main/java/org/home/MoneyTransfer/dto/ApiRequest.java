@@ -1,6 +1,7 @@
 package org.home.MoneyTransfer.dto;
 
 import lombok.Builder;
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -8,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Builder
+@Getter
 public class ApiRequest {
 
     private HttpStatus statusTemp;
