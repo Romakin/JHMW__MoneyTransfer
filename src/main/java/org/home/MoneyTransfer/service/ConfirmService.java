@@ -8,6 +8,7 @@ import org.home.MoneyTransfer.dao.PayCard;
 import org.home.MoneyTransfer.dto.ConfirmRequest;
 import org.home.MoneyTransfer.repository.OperationReporitory;
 import org.home.MoneyTransfer.repository.PayCardRepository;
+import org.home.MoneyTransfer.service.utils.HashService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +20,6 @@ public class ConfirmService {
 
     private PayCardRepository payCardRepository;
     private OperationReporitory operationReporitory;
-    private HashService hash;
     private CurrencyRateService currencyRate;
 
     /**
@@ -30,33 +30,61 @@ public class ConfirmService {
      */
     @Transactional
     public String confirm(ConfirmRequest request) {
-        Operation o = operationReporitory.findById(request.getOperationId()).get();
-        PayCard payCardFrom = o.getPayCardFrom(),
-                payCardTo = o.getPayCardTo();
-        payCardFrom.setBalance(
-                payCardFrom.getBalance() -
-                        ( o.getAmountValue() /
-                            currencyRate.getRateIndex(
-                                    payCardFrom.getCurrency(),
-                                    Currency.valueWithLabel(o.getAmountCurrency())
-                            )
-                        )
-        );
-        payCardTo.setBalance(
-                payCardTo.getBalance() +
-                        currencyRate.exchange(
-                                o.getAmountValue(),
-                                payCardTo.getCurrency(),
-                                Currency.valueWithLabel(o.getAmountCurrency())
-                        )
-        );
-        o.setOperationStatus(OperationStatus.SUCCESS);
-        o.setVerificationHash("_SUCCESS_");
+        Operation operation = operationReporitory.findById(request.getOperationId()).get();
+        PayCard payCardFrom = operation.getPayCardFrom(),
+                payCardTo = operation.getPayCardTo();
+        setNewBalanceToPayCardFrom(operation, payCardFrom);
+        setNewBalanceToPayCardTo(operation, payCardTo);
+        confirmOperationAndSaveAll(operation, payCardFrom, payCardTo);
+        return operation.getOperationId();
+    }
+
+    /**
+     * Update operation status and save operation and changed cards
+     * @param operation
+     * @param payCardFrom
+     * @param payCardTo
+     */
+    private void confirmOperationAndSaveAll(Operation operation, PayCard payCardFrom, PayCard payCardTo) {
+        operation.setOperationStatus(OperationStatus.SUCCESS);
+        operation.setVerificationHash("_SUCCESS_");
         payCardRepository.save(payCardFrom);
         payCardRepository.save(payCardTo);
         payCardRepository.flush();
-        operationReporitory.saveAndFlush(o);
-        return o.getOperationId();
+        operationReporitory.saveAndFlush(operation);
+    }
+
+    /**
+     * Decrease card's balance with rate
+     * @param operation
+     * @param payCardTo
+     */
+    private void setNewBalanceToPayCardTo(Operation operation, PayCard payCardTo) {
+        payCardTo.setBalance(
+                payCardTo.getBalance() +
+                        currencyRate.exchange(
+                                operation.getAmountValue(),
+                                payCardTo.getCurrency(),
+                                Currency.valueWithLabel(operation.getAmountCurrency())
+                        )
+        );
+    }
+
+    /**
+     * Decrease card's balance with rate
+     * @param operation
+     * @param payCardFrom
+     */
+    private void setNewBalanceToPayCardFrom(Operation operation, PayCard payCardFrom) {
+        payCardFrom.setBalance(
+                payCardFrom.getBalance() -
+                        ( operation.getAmountValue() /
+                            currencyRate.getRateIndex(
+                                    payCardFrom.getCurrency(),
+                                    Currency.valueWithLabel(operation.getAmountCurrency())
+                            )
+                        )
+        );
     }
 
     /**
@@ -65,10 +93,10 @@ public class ConfirmService {
      * @return
      */
     public boolean checkValidRequest(ConfirmRequest request) {
-        Optional<Operation> o = operationReporitory.findById(request.getOperationId());
+        Optional<Operation> operation = operationReporitory.findById(request.getOperationId());
         return  (
-                o.isPresent() &&
-                        o.get().getVerificationHash().equals(hash.getMD5(request.getCode()))
+                operation.isPresent() &&
+                        operation.get().getVerificationHash().equals(HashService.getMD5(request.getCode()))
         );
     }
 }

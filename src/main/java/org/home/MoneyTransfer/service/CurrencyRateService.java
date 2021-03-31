@@ -1,10 +1,18 @@
 package org.home.MoneyTransfer.service;
 
+import lombok.AllArgsConstructor;
 import org.home.MoneyTransfer.dao.Currency;
+import org.home.MoneyTransfer.dao.CurrencyRate;
+import org.home.MoneyTransfer.repository.CurrencyRateRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
+@AllArgsConstructor
 @Service
 public class CurrencyRateService {
+
+    private CurrencyRateRepository currencyRateRepository;
 
     /**
      * Exchange money in normal mode
@@ -15,7 +23,10 @@ public class CurrencyRateService {
      * @return exchangeSum
      */
     public double exchange(double sumFrom, Currency currencyFrom, Currency currencyTo) {
-        return sumFrom * getRateIndex(currencyFrom, currencyTo);
+        double val = sumFrom * getRateIndex(currencyFrom, currencyTo) * 10000;
+        val = Math.round(val);
+        val = val / 10000;
+        return val;
     }
 
     /**
@@ -26,24 +37,10 @@ public class CurrencyRateService {
      * @return rateIndex
      */
     public double getRateIndex(Currency currencyFrom, Currency currencyTo) {
-        switch (currencyFrom) {
-            case EUR:
-                switch (currencyTo) {
-                    case RUR: return 86.75;
-                    case USD: return 1.16;
-                }
-            case RUR:
-                switch (currencyTo) {
-                    case EUR: return 1/90.4;
-                    case USD: return 1/75.5;
-                }
-                break;
-            case USD:
-                switch (currencyTo) {
-                    case RUR: return 71.85;
-                    case EUR: return 1/1.24;
-                }
-                break;
+        Optional<CurrencyRate> currencyRateOptional =
+                currencyRateRepository.findByCurrencyFromAndCurrencyTo(currencyFrom, currencyTo);
+        if (currencyRateOptional.isPresent()) {
+            return currencyRateOptional.get().getRateIndex();
         }
         return 1;
     }

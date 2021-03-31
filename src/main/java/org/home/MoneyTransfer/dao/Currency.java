@@ -15,7 +15,7 @@ public enum Currency {
     USD("USD"),
     EUR("EUR");
 
-    String label;
+    private String label;
     Currency(String label) {
         this.label = label.toUpperCase();
     }

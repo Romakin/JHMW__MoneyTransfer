@@ -28,3 +28,19 @@ VALUES ('7894789478947894',
         '99C5E07B4D5DE9D18C350CDF64C5AA3D', --567
         'USD',
         1548);
+
+-- CURRENCY RATES
+INSERT INTO Currency_Rate (rate_id, currency_from, currency_to, rate_index)
+VALUES (1, 'EUR', 'RUR', 86.750);
+INSERT INTO Currency_Rate (rate_id, currency_from, currency_to, rate_index)
+VALUES (2, 'EUR', 'USD', 1.160);
+
+INSERT INTO Currency_Rate (rate_id, currency_from, currency_to, rate_index)
+VALUES (3, 'RUR', 'EUR', 0.011);
+INSERT INTO Currency_Rate (rate_id, currency_from, currency_to, rate_index)
+VALUES (4, 'RUR', 'USD', 0.013);
+
+INSERT INTO Currency_Rate (rate_id, currency_from, currency_to, rate_index)
+VALUES (5, 'USD', 'RUR', 71.85);
+INSERT INTO Currency_Rate (rate_id, currency_from, currency_to, rate_index)
+VALUES (6, 'USD', 'EUR', 0.806);

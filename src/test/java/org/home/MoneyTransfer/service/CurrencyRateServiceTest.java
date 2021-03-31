@@ -29,10 +29,10 @@ class CurrencyRateServiceTest {
 
         Assertions.assertEquals(res, 867.50);
         Assertions.assertEquals(res1, 11.60);
-        Assertions.assertEquals(res2, 1);
-        Assertions.assertEquals(res3, 1);
+        Assertions.assertEquals(res2, 0.9944);
+        Assertions.assertEquals(res3, 0.9815);
         Assertions.assertEquals(res4, 718.50);
-        Assertions.assertEquals(res5, 1);
+        Assertions.assertEquals(res5, 0.9994);
         Assertions.assertEquals(res6, 10.00);
 
     }

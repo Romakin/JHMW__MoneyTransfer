@@ -7,6 +7,8 @@ import org.home.MoneyTransfer.dao.PayCard;
 import org.home.MoneyTransfer.dto.ConfirmRequest;
 import org.home.MoneyTransfer.dto.TransferRequest;
 import org.home.MoneyTransfer.dto.TransferRequestAmount;
+import org.home.MoneyTransfer.repository.OperationReporitory;
+import org.home.MoneyTransfer.repository.PayCardRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +29,11 @@ class ConfirmServiceTest {
     private ConfirmService confirmService;
     @Autowired
     private TransferService transferService;
+    @Autowired
+    private PayCardRepository payCardRepository;
+    @Autowired
+    private OperationReporitory operationReporitory;
+
     private List<PayCard> cards = Arrays.asList(new PayCard[]{
             new PayCard(
                     null, "1238923412356232",
@@ -43,8 +50,8 @@ class ConfirmServiceTest {
 
     @BeforeEach
     void transfer() {
-        transferService.getPayCardRepository().saveAndFlush(cards.get(0));
-        transferService.getPayCardRepository().saveAndFlush(cards.get(1));
+        payCardRepository.saveAndFlush(cards.get(0));
+        payCardRepository.saveAndFlush(cards.get(1));
         TransferRequest request = new TransferRequest(
                 cards.get(0).getCardNumber(), cards.get(0).getTillDate(), "567",
                 cards.get(1).getCardNumber(),
@@ -55,8 +62,9 @@ class ConfirmServiceTest {
 
     @AfterEach
     void removeCards() {
-        transferService.getOperationReporitory().deleteAll();
-        transferService.getPayCardRepository().deleteAll();
+        operationReporitory.deleteById(operId);
+        payCardRepository.delete(cards.get(0));
+        payCardRepository.delete(cards.get(1));
     }
 
     @AfterAll
@@ -82,7 +90,7 @@ class ConfirmServiceTest {
 
         Assertions.assertEquals(respOperId, operId);
 
-        Optional<Operation> oper = transferService.getOperationReporitory().findById(operId);
+        Optional<Operation> oper = operationReporitory.findById(operId);
 
         Assertions.assertTrue(oper.isPresent());
         Assertions.assertEquals(oper.get().getOperationStatus(), OperationStatus.SUCCESS);

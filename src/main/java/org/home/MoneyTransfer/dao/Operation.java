@@ -21,25 +21,25 @@ public class Operation {
             @GenericGenerator(name = "oid-generator",
             strategy = "org.home.MoneyTransfer.dao.generator.OperationIdGenerator",//"${daoOperationGeneratorStrategy}",
             parameters = @org.hibernate.annotations.Parameter(name = "prefix", value = "OID_"))
-    String operationId;
+    private String operationId;
 
     @OneToOne @NotNull
-    PayCard payCardFrom;
+    private PayCard payCardFrom;
 
     @OneToOne @NotNull
-    PayCard payCardTo;
+    private PayCard payCardTo;
 
     @Column(nullable = false)
-    double amountValue;
+    private double amountValue;
 
     @Column(nullable = false)
-    String amountCurrency;
+    private String amountCurrency;
 
     @Column(nullable = false)
-    String verificationHash;
+    private String verificationHash;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    OperationStatus operationStatus;
+    private OperationStatus operationStatus;
 
 }

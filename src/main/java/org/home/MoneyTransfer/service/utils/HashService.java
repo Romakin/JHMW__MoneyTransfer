@@ -1,13 +1,10 @@
-package org.home.MoneyTransfer.service;
-
-import org.springframework.stereotype.Service;
+package org.home.MoneyTransfer.service.utils;
 
 import javax.xml.bind.DatatypeConverter;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-@Service
 public class HashService {
 
     /**
@@ -15,7 +12,7 @@ public class HashService {
      * @param code
      * @return md5 hash
      */
-    public String getMD5(String code) {
+    public static String getMD5(String code) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(code.getBytes(Charset.forName("UTF-8")));

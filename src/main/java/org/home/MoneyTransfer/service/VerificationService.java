@@ -27,11 +27,11 @@ public class VerificationService {
 
     public void writeToFile(String code) {
         String path = "./gen/codes.txt";
-        File lf = new File(path);
-        if (!(lf.exists() && lf.canRead() && lf.canWrite())) {
+        File file = new File(path);
+        if (!(file.exists() && file.canRead() && file.canWrite())) {
             try {
-                new File(lf.getParent()).mkdirs();
-                if (lf.createNewFile()) {
+                new File(file.getParent()).mkdirs();
+                if (file.createNewFile()) {
                     System.out.println("File created");
                 } else {
                     return;
@@ -42,7 +42,7 @@ public class VerificationService {
             }
         }
         try {
-            Files.write(Paths.get(lf.getAbsolutePath()), code.getBytes(), StandardOpenOption.APPEND);
+            Files.write(Paths.get(file.getAbsolutePath()), code.getBytes(), StandardOpenOption.APPEND);
         } catch (IOException e) {
             System.out.println("saveToFile: " + e.getMessage());
         }

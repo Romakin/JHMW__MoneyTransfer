@@ -25,6 +25,11 @@ class TransferServiceTest {
 
     @Autowired
     private TransferService transferService;
+    @Autowired
+    private PayCardRepository payCardRepository;
+    @Autowired
+    private OperationReporitory operationReporitory;
+
     private List<PayCard> cards = Arrays.asList(new PayCard[]{
             new PayCard(
                     null, "1238923412356232",
@@ -40,14 +45,14 @@ class TransferServiceTest {
 
     @BeforeEach
     void setUp() {
-        transferService.getPayCardRepository().saveAndFlush(cards.get(0));
-        transferService.getPayCardRepository().saveAndFlush(cards.get(1));
+        payCardRepository.saveAndFlush(cards.get(0));
+        payCardRepository.saveAndFlush(cards.get(1));
     }
 
     @AfterEach
     void removeCards() {
-        transferService.getOperationReporitory().deleteAll();
-        transferService.getPayCardRepository().deleteAll();
+        operationReporitory.deleteAll();
+        payCardRepository.deleteAll();
     }
 
     @AfterAll
@@ -66,7 +71,7 @@ class TransferServiceTest {
 
         String operId = transferService.transfer(request);
 
-        Optional<Operation> opOper = transferService.getOperationReporitory().findById(operId);
+        Optional<Operation> opOper = operationReporitory.findById(operId);
 
         Assertions.assertTrue(opOper.isPresent());
         Assertions.assertEquals(opOper.get().getOperationStatus(), OperationStatus.PREPARED);

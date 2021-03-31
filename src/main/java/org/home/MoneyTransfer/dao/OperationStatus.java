@@ -5,7 +5,7 @@ public enum OperationStatus {
     SUCCESS(2),
     ERROR(3);
 
-    int value;
+    private int value;
 
     OperationStatus(int value) {
         this.value = value;

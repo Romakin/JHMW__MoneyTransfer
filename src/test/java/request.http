@@ -11,3 +11,19 @@ Content-Type: application/json
     "currency": "Rub"
   }
 }
+
+###
+
+POST http://localhost:5500/transfer
+Content-Type: application/json
+
+{
+"cardFromNumber": "1234123412341234",
+"cardFromValidTill": "02/24",
+"cardFromCVV": "009",
+"cardToNumber": "4321432143214321",
+"amount": {
+"value": 10,
+"currency": "RUR"
+}
+}

@@ -9,6 +9,7 @@ import org.home.MoneyTransfer.dao.Currency;
 import org.home.MoneyTransfer.dto.TransferRequestAmount;
 import org.home.MoneyTransfer.repository.OperationReporitory;
 import org.home.MoneyTransfer.repository.PayCardRepository;
+import org.home.MoneyTransfer.service.utils.HashService;
 import org.springframework.stereotype.Service;
 
 import java.time.YearMonth;
@@ -20,7 +21,6 @@ public class TransferService {
 
     private PayCardRepository payCardRepository;
     private OperationReporitory operationReporitory;
-    private HashService hash;
     private VerificationService verification;
     private CurrencyRateService currencyRate;
 
@@ -33,18 +33,18 @@ public class TransferService {
         String verificationCode = verification.generateVerificationCode();
         PayCard cardFrom = payCardRepository.findByCardNumber(request.getCardFromNumber()).get();
         try {
-            Operation o = operationReporitory.saveAndFlush(
+            Operation operation = operationReporitory.saveAndFlush(
                     Operation.builder()
                             .payCardFrom(cardFrom)
                             .payCardTo(payCardRepository.findByCardNumber(request.getCardToNumber()).get())
                             .amountCurrency(request.getAmount().getCurrency())
                             .amountValue(request.getAmount().getValue())
                             .operationStatus(OperationStatus.PREPARED)
-                            .verificationHash(hash.getMD5(verificationCode))
+                            .verificationHash(HashService.getMD5(verificationCode))
                             .build()
             );
             verification.sendVerificationCode(verificationCode, cardFrom);
-            return o.getOperationId();
+            return operation.getOperationId();
         } catch (Exception e) {
             return null;
         }
@@ -60,7 +60,7 @@ public class TransferService {
         return (
                 payCard != null &&
                         payCardRepository.findByCardNumber(request.getCardToNumber()).isPresent() &&
-                        payCard.getCVVHash().equals(hash.getMD5(request.getCardFromCVV())) &&
+                        payCard.getCVVHash().equals(HashService.getMD5(request.getCardFromCVV())) &&
                         payCard.getTillDate().equals(request.getCardFromValidTill()) &&
                         Currency.valueWithLabel(request.getAmount().getCurrency()) != null &&
                         checkValidDate(payCard.getTillDate()) &&
@@ -93,11 +93,4 @@ public class TransferService {
         return balanceVal - amount.getValue() > 0;
     }
 
-    public PayCardRepository getPayCardRepository() {
-        return payCardRepository;
-    }
-
-    public OperationReporitory getOperationReporitory() {
-        return operationReporitory;
-    }
 }
